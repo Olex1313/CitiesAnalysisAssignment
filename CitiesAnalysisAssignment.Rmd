@@ -1,0 +1,9 @@
+---
+title: "CitiesAnalysisAssignment"
+author: "Evelina Markova"
+date: "19 02 2022"
+output: pdf_document
+---
+
+# Reading data
+
