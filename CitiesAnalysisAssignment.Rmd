@@ -1,9 +1,21 @@
 ---
-title: "CitiesAnalysisAssignment"
+title: "CAA"
 author: "Evelina Markova"
 date: "19 02 2022"
 output: pdf_document
 ---
 
+Подключение библиотеки tidyverse
+
+```{r}
+library(tidyverse)
+```
+
 # Reading data
+
+Чтение данных 
+
+```{r}
+data <- read_csv("./best cities for a workation.csv")
+```
 
