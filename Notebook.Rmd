@@ -1,7 +1,6 @@
 ---
-title: "Homework 1"
-subtitle: Подтема
-author: Автор
+title: "Домашняя работа 1"
+author: Лимонов А.А, Маркова Э.С, Гаврилова П.А
 date: \today
 toc: true
 toc-depth: 2
@@ -18,7 +17,7 @@ library(tidyverse)
 
 ## Домашняя работа 1
 
-Для анализа был взят [датасет](https://www.kaggle.com/prasertk/the-best-cities-for-a-workation) с популярными для релокации городами. Предположим, что мы типичный IT-специалист, который подбирает место для будущей жизни и его интересуют только часть переменных из датасета
+Для анализа был взят [датасет](https://www.kaggle.com/prasertk/the-best-cities-for-a-workation) с популярными для релокации городами. Предположим, что мы IT-специалист, который подбирает место для будущей жизни и его интересуют только часть переменных из датасета
 
 ```{r, results='hide', message=FALSE}
 best_cities_for_a_workation <- 
@@ -46,7 +45,7 @@ best_cities_for_a_workation <- best_cities_for_a_workation %>% mutate(
 ```
 После обработки датасет выглядит так:
 ```{r, echo=FALSE}
-head(best_cities_for_a_workation)
+head(best_cities_for_a_workation) %>% str()
 ```
 
 Сохраним полученный датасет в формат `.rds`
@@ -55,32 +54,82 @@ saveRDS(best_cities_for_a_workation, file="our_data.rds")
 ```
 
 Теперь перейдём к разделению на группы, посмотрим на список стран, выберем из них несколько интересующих нас и выделим из датасета 5 стран с наибольшим количеством городов
-```{r}
-top_five_countries <- best_cities_for_a_workation %>% group_by(country) %>% summarise(count=n()) %>% arrange(desc(count)) %>% slice(1:5)
+```{r, results='hide'}
+top_five_countries <- 
+  best_cities_for_a_workation %>% group_by(country) %>% 
+  summarise(count=n()) %>% arrange(desc(count)) %>% slice(1:5)
 usa_cities <- best_cities_for_a_workation %>% filter(
   country =="United States"
-) %>% select(-country)
-print(usa_cities)
+)
 germany_cities <- best_cities_for_a_workation %>% filter(
   country == "Germany"
-) %>% select(-country)
-print(germany_cities)
+)
 canada_cities <- best_cities_for_a_workation %>% filter(
   country == "Canada"
-) %>% select(-country)
-print(canada_cities)
+)
 spain_cities <- best_cities_for_a_workation %>% filter(
   country == "Spain"
-) %>% select(-country)
-print(spain_cities)
+)
 uk_cities <- best_cities_for_a_workation %>% filter(
   country == "United Kingdom"
-) %>% select(-country)
-print(uk_cities)
+)
+countries_and_ctities <- 
+  bind_rows(usa_cities, germany_cities, canada_cities, spain_cities, uk_cities)
+str(countries_and_ctities)
 ```
-Затем посчитаем основные описательные статистики для каждой из групп
+Затем посчитаем основные описательные статистики для всех наших стран
 ```{r}
-usa_cities %>% select(average_evening_spends) %>% summarise_all(list(mean, median, sd, min, max)) %>% rename("Mean" = "fn1", "Median" = "fn2", "Standard Deviation" = "fn3", "Min" = "fn4", "Max" = "fn5") %>% print()
+  countries_and_ctities %>% 
+  summarise(
+    mean(average_evening_spends),
+    median(average_evening_spends),
+    sd(average_evening_spends),
+    min(average_evening_spends),
+    max(average_evening_spends)
+    ) %>% str()
 ```
-
-
+Затем посчитаем отдельно для Германии, Великобритании и США
+```{r}
+  germany_cities %>% 
+  summarise(
+    mean(average_evening_spends),
+    median(average_evening_spends),
+    sd(average_evening_spends),
+    min(average_evening_spends),
+    max(average_evening_spends)
+    ) %>% str()
+  uk_cities %>% 
+  summarise(
+    mean(average_evening_spends),
+    median(average_evening_spends),
+    sd(average_evening_spends),
+    min(average_evening_spends),
+    max(average_evening_spends)
+    ) %>% str()
+  usa_cities %>% 
+  summarise(
+    mean(average_evening_spends),
+    median(average_evening_spends),
+    sd(average_evening_spends),
+    min(average_evening_spends),
+    max(average_evening_spends)
+    ) %>% str()
+```
+Для сравнения посчитаем то же самое для всех городов из нашего датасета
+```{r}
+  best_cities_for_a_workation %>% 
+  summarise(
+    mean(average_evening_spends),
+    median(average_evening_spends),
+    sd(average_evening_spends),
+    min(average_evening_spends),
+    max(average_evening_spends)
+    ) %>% str()
+```
+Если взглянуть на итоговые данные, то можно заметить, что разброс средних трат среди всех стран довольно высокий: `sd(average_evening_spends) = 9.06`, что связано с малым кол-вом данных о городах и их расположении. В то же время отметим, что в Германии, например, довольно стабильные траты на вечер, в отличие от других интересующих нас стран. Также среднее среди трат внутри 5 наиболее представленных стран лежит в пределах 1 стандартного отклонения среди всех городов. Можно попробовать определить, что больше всего влияет на нашу перменную, посчитав статистики для всех городов и сравнив их с нашими
+```{r}
+best_cities_for_a_workation %>% 
+  select(drinks_price, taxi_price, restaurant_price) %>% 
+  summary() 
+```
+Как можно заметить исходя из среднего значения, наибольшее влияние оказывают цена на напитки и ужин в ресторане, стоимость такси влияет меньше всего.
